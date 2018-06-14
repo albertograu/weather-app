@@ -13,4 +13,6 @@ app.listen(3000, function () {
 });
 
 // EJS templating language
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
+// Use CSS styles in public folder
+app.use(express.static('public'));
