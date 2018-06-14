@@ -1,28 +1,54 @@
-const express = require("express");
-const app = express();
+const express = require('express');
 const bodyParser = require('body-parser');
+const request = require('request');
+const app = express()
 
-// Use CSS styles in public folder
+require('dotenv').config();
+const apiKey = process.env.WEATHER_API_KEY;
+
 app.use(express.static('public'));
-// Body parser middleware (Express). By using body-parser we can make use of the req.body object.
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-// EJS templating language
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs')
 
-// GET root route and renders index.html
-// Instead of using res.send, we use res.render when working with a templating language. 
-app.get("/", function (request, response) {
-  response.render("index");
-});
+// GET
+app.get('/', function (req, res) {
+  res.render('index', {
+    weather: null,
+    error: null
+  });
+})
 
 // POST
-app.post("/", function (request, response) {
-  response.render("index");
-  console.log(request.body.city);
-});
+app.post('/', function (req, res) {
+  let city = req.body.city;
+  let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
+
+  request(url, function (err, response, body) {
+    if (err) {
+      res.render('index', {
+        weather: null,
+        error: 'Error, please try again'
+      });
+    } else {
+      let weather = JSON.parse(body)
+      if (weather.main == undefined) {
+        res.render('index', {
+          weather: null,
+          error: 'Error, please try again'
+        });
+      } else {
+        let weatherText = `It's currently ${weather.main.temp} degrees in ${weather.name}!`;
+        res.render('index', {
+          weather: weatherText,
+          error: null
+        });
+      }
+    }
+  });
+})
 
 app.listen(3000, function () {
-  console.log("Example app is running on port 3000!");
-});
+  console.log('Example app listening on port 3000!')
+})
