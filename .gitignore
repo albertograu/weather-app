@@ -74,5 +74,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Docker
+.dockerignore
+
 
 # End of https://www.gitignore.io/api/osx,node
